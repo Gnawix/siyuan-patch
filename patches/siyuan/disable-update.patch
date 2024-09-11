@@ -2,7 +2,7 @@ diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.
 index 1ec00f1784be5d89a8ecae59f9807f6da1f20ca5..9dcbddba692ba2af923179eee296b69d403f92d5 100644
 --- forkSrcPrefix/kernel/model/mount.go
 +++ forkDstPrefix/kernel/model/mount.go
-@@ -225,8 +225,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
+@@ -222,8 +222,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
  			util.PushErrMsg(Conf.Language(52), 7000)
  
  			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
