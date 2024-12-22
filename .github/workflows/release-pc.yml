@@ -23,20 +23,27 @@ jobs:
             goos: "linux"
             goarch: "amd64"
             suffix: "linux.tar.gz"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin/SiYuan-Kernel"
+          - os: ubuntu-20.04
+            kernel_path: "../app/kernel-linux-arm64/SiYuan-Kernel"
             build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
-            electron_args: "dist-darwin"
-            goos: "darwin"
-            goarch: "amd64"
-            suffix: "mac.dmg"
-          - os: macos-latest
-            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Kernel"
-            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
-            electron_args: "dist-darwin-arm64"
-            goos: "darwin"
+            electron_args: "dist-linux-arm64"
+            goos: "linux"
             goarch: "arm64"
-            suffix: "mac-arm64.dmg"
+            suffix: "linux-arm64.tar.gz"
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin/SiYuan-Kernel"
+          #   build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin"
+          #   goos: "darwin"
+          #   goarch: "amd64"
+          #   suffix: "mac.dmg"
+          # - os: macos-latest
+          #   kernel_path: "../app/kernel-darwin-arm64/SiYuan-Kernel"
+          #   build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+          #   electron_args: "dist-darwin-arm64"
+          #   goos: "darwin"
+          #   goarch: "arm64"
+          #   suffix: "mac-arm64.dmg"
           - os: windows-2019
             kernel_path: "../app/kernel/SiYuan-Kernel.exe"
             build_args: "-s -w -H=windowsgui -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
@@ -65,6 +72,15 @@ jobs:
           git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/mock-vip-user.patch
 
           git status
+
+      - name: Set up cross-compilation tools for ARM64
+        run: |
+          if [ "${{ matrix.config.goarch }}" == "arm64" ]; then
+            sudo apt-get update
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          fi
+        if: matrix.config.goarch == 'arm64'
+
 
       - name: Set up MingGW
         uses: msys2/setup-msys2@v2
@@ -126,6 +142,8 @@ jobs:
           GOOS: ${{ matrix.config.goos }}
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
+          CC: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-gcc' || '' }}   # 仅在 ARM64 时设置
+          CXX: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-g++' || '' }}  # 仅在 ARM64 时设置
 
       - name: Building Electron
         run: pnpm run ${{ matrix.config.electron_args }}
