@@ -73,13 +73,13 @@ jobs:
 
           git status
 
-      - name: Set up cross-compilation tools for ARM64
-        run: |
-          if [ "${{ matrix.config.goarch }}" == "arm64" ]; then
-            sudo apt-get update
-            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-          fi
-        if: matrix.config.goarch == 'arm64'
+      # - name: Set up cross-compilation tools for ARM64
+      #   run: |
+      #     if [ "${{ matrix.config.goarch }}" == "arm64" ]; then
+      #       sudo apt-get update
+      #       sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      #     fi
+      #   if: matrix.config.goarch == 'arm64'
 
 
       - name: Set up MingGW
@@ -138,12 +138,12 @@ jobs:
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel
         env:
           GO111MODULE: on
-          CGO_ENABLED: 1
+          CGO_ENABLED: ${{ matrix.config.goarch == 'arm64' && '0' || '1' }}
           GOOS: ${{ matrix.config.goos }}
           GOPATH: ${{ github.workspace }}/go
           GOARCH: ${{ matrix.config.goarch }}
-          CC: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-gcc' || '' }}   # 仅在 ARM64 时设置
-          CXX: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-g++' || '' }}  # 仅在 ARM64 时设置
+          # CC: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-gcc' || '' }}   # 仅在 ARM64 时设置
+          # CXX: ${{ matrix.config.goarch == 'arm64' && 'aarch64-linux-gnu-g++' || '' }}  # 仅在 ARM64 时设置
 
       - name: Building Electron
         run: pnpm run ${{ matrix.config.electron_args }}
